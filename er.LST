@@ -1,0 +1,379 @@
+C51 COMPILER V9.01   ER                                                                    03/04/2023 01:18:47 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE ER
+OBJECT MODULE PLACED IN er.OBJ
+COMPILER INVOKED BY: D:\keil\C51\BIN\C51.EXE er.c BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          #include<regx51.h>
+   2          
+   3          typedef unsigned char uchar;
+   4          typedef unsigned int uint;
+   5          
+   6          uchar code num[11]={0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0X40};  // 0~9×ÖÂë
+   7          
+   8          uchar miao=50, fen=59, shi=23,day=28,mon=02,year=21; //½øÎ»±êÖ¾Î»
+   9          
+  10          uint i=0;  //¼ÆÊ±
+  11          
+  12          uchar miao_L, miao_H, fen_L, fen_H, shi_L, shi_H, day_g,day_s,mon_g,mon_s,year_g,year_s; //Ê±¡¢·Ö¡¢ÃëµÄ¸öÎ
+             -»£¨xxx_L£©ºÍÊ®Î»£¨xxx_H£©
+  13          
+  14           void delay_ms(unsigned int t)
+  15          {
+  16   1            unsigned int i,j; 
+  17   1            for(j=0;j<t;j++)    
+  18   1                 for(i=0;i<116;i++);
+  19   1         }//ÑÓÊ±º¯Êý 
+  20          
+  21          void Timer0Init(void)           //1ºÁÃë@12.000MHz
+  22          {
+  23   1              TMOD &= 0xF0;           //ÉèÖÃ¶¨Ê±Æ÷Ä£Ê½
+  24   1              TMOD |= 0x01;           //ÉèÖÃ¶¨Ê±Æ÷Ä£Ê½
+  25   1              TL0 = 0x18;             //ÉèÖÃ¶¨Ê±³õÖµ
+  26   1              TH0 = 0xFC;             //ÉèÖÃ¶¨Ê±³õÖµ
+  27   1              TF0 = 0;                //Çå³ýTF0±êÖ¾
+  28   1              TR0 = 1;                //¶¨Ê±Æ÷0¿ªÊ¼¼ÆÊ±
+  29   1         ET0=1;
+  30   1         EA=1;
+  31   1         PT0=0;
+  32   1      }
+  33           void Nixie1(unsigned char Location1,Number1)
+  34          {
+  35   1              switch(Location1)               //Î»ÂëÊä³ö
+  36   1              {
+  37   2                      case 9:P2_7=0;P2_6=0;P2_5=0;break; //LED9
+  38   2                      case 10:P2_7=0;P2_6=0;P2_5=1;break;     //LED10
+  39   2                      case 11:P2_7=0;P2_6=1;P2_5=0;break;
+  40   2                      case 12:P2_7=0;P2_6=1;P2_5=1;break;
+  41   2                      case 13:P2_7=1;P2_6=0;P2_5=0;break;
+  42   2                      case 14:P2_7=1;P2_6=0;P2_5=1;break;
+  43   2                      case 15:P2_7=1;P2_6=1;P2_5=0;break;
+  44   2                      case 16:P2_7=1;P2_6=1;P2_5=1;break;
+  45   2              }
+  46   1              P0=num[Number1];        //¶ÎÂëÊä³ö
+  47   1              delay_ms(1);                            //ÏÔÊ¾Ò»¶ÎÊ±¼ä
+  48   1          P0=0x00;    //¶ÎÂëÇå0£¬ÏûÓ°
+  49   1      }
+  50           void Nixie2(unsigned char Location2,Number2)
+  51          {
+  52   1              switch(Location2)               //Î»ÂëÊä³ö
+  53   1              {
+  54   2                  case 1:P2_3=0;P2_2=0;P2_1=0;break; //LED1
+C51 COMPILER V9.01   ER                                                                    03/04/2023 01:18:47 PAGE 2   
+
+  55   2                      case 2:P2_3=0;P2_2=0;P2_1=1;break;
+  56   2                      case 3:P2_3=0;P2_2=1;P2_1=0;break;
+  57   2                      case 4:P2_3=0;P2_2=1;P2_1=1;break;
+  58   2                      case 5:P2_3=1;P2_2=0;P2_1=0;break;
+  59   2                      case 6:P2_3=1;P2_2=0;P2_1=1;break;
+  60   2                      case 7:P2_3=1;P2_2=1;P2_1=0;break;
+  61   2                      case 8:P2_3=1;P2_2=1;P2_1=1;break;
+  62   2              }
+  63   1              P1=num[Number2];        //¶ÎÂëÊä³ö
+  64   1              delay_ms(1);                            //ÏÔÊ¾Ò»¶ÎÊ±¼ä
+  65   1          P1=0x00;    //¶ÎÂëÇå0£¬ÏûÓ°
+  66   1      }
+  67          void display(){  //ÏÔÊ¾
+  68   1          Nixie1(16,miao_L);
+  69   1              Nixie1(15,miao_H);
+  70   1              Nixie1(14,10);  
+  71   1              Nixie1(13,fen_L);
+  72   1              Nixie1(12,fen_H);
+  73   1              Nixie1(11,10);  
+  74   1              Nixie1(10,shi_L); 
+  75   1              Nixie1(9,shi_H);         
+  76   1              Nixie2(8,day_g);        
+  77   1              Nixie2(7,day_s);        
+  78   1              Nixie2(6,10);   
+  79   1              Nixie2(5,mon_g);         
+  80   1              Nixie2(4,mon_s);         
+  81   1              Nixie2(3,10);    
+  82   1              Nixie2(2,year_g);
+  83   1              Nixie2(1,year_s); 
+  84   1      }
+  85          void keyscan(){  //°´¼üº¯Êý
+  86   1        switch(P3)
+  87   1        { 
+  88   2         case(0x3E):
+  89   2         { 
+  90   3          if(P2_4==0)
+  91   3              {delay_ms(20);
+  92   4                      if(P2_4== 0)
+  93   4                      {
+  94   5                              year++;  
+  95   5                              while(!P2_4);
+  96   5                      } 
+  97   4               }
+  98   3              }//Äê£«£«
+  99   2         case(0x7E):
+ 100   2         {   
+ 101   3         if(P2_4==0)
+ 102   3         {delay_ms(20);
+ 103   4                      if(P2_4==0)
+ 104   4                      {
+ 105   5                              year--;  
+ 106   5                              while(!P2_4);
+ 107   5                      }  
+ 108   4               }
+ 109   3          }//Äê--
+ 110   2         case(0x3D):{ 
+ 111   3         if(P2_4==0)
+ 112   3         {delay_ms(20);
+ 113   4                      if(P2_4== 0)
+ 114   4                      {
+ 115   5                         mon++;
+ 116   5                         if(mon==13){mon=1;} 
+C51 COMPILER V9.01   ER                                                                    03/04/2023 01:18:47 PAGE 3   
+
+ 117   5                              while(!P2_4);
+ 118   5                      }  
+ 119   4               }
+ 120   3         }//ÔÂ++
+ 121   2         case(0x7D):{ 
+ 122   3         if(P2_4==0)
+ 123   3         {delay_ms(20);
+ 124   4                      if(P2_4== 0)
+ 125   4                      {
+ 126   5                              mon--; 
+ 127   5                              if(mon==0){mon=12;} 
+ 128   5                              while(!P2_4);
+ 129   5                      }  
+ 130   4               }
+ 131   3       }// ÔÂ--
+ 132   2         case(0x3B):{   
+ 133   3               if(P2_4==0)
+ 134   3         {delay_ms(20);
+ 135   4                      if(P2_4== 0)
+ 136   4                      {
+ 137   5                              day++;
+ 138   5                              if(mon==1||mon==3||mon==5||mon==7||mon==8||mon==10||mon==12) 
+ 139   5                              {if(day==32){day=1;}}
+ 140   5                              else if(mon==4||mon==6||mon==9||mon==11) {if(day==31){day=1;}}
+ 141   5                              else if(mon==2)
+ 142   5                                              {
+ 143   6                                              if((year+2000)%400==0||((year+2000)%100!=0&&(year+2000)%4==0))
+ 144   6                                                      {
+ 145   7                                                              if(day==30)
+ 146   7                                                                      {day=1;}}
+ 147   6                                               else  
+ 148   6                                                              {
+ 149   7                                                              if(day==29)
+ 150   7                                                              {day=1;}
+ 151   7                                                              }
+ 152   6                                              }
+ 153   5                              while(!P2_4);
+ 154   5                      }  
+ 155   4               }
+ 156   3         }// ÈÕ++
+ 157   2         case(0x7B):{   
+ 158   3                 if(P2_4==0)
+ 159   3         {delay_ms(20);
+ 160   4                      if(P2_4== 0)
+ 161   4                      {
+ 162   5                              day--; 
+ 163   5                              if(mon==1||mon==3||mon==5||mon==7||mon==8||mon==10||mon==12) 
+ 164   5                              {if(day==0){day=31;}}
+ 165   5                              else if(mon==4||mon==6||mon==9||mon==11) {if(day==0){day=30;}}
+ 166   5                              else if(mon==2)
+ 167   5                                              {
+ 168   6                                              if((year+2000)%400==0||((year+2000)%100!=0&&(year+2000)%4==0))
+ 169   6                                                      {
+ 170   7                                                              if(day==0)
+ 171   7                                                                      {day=29;}}
+ 172   6                                               else  
+ 173   6                                                              {
+ 174   7                                                              if(day==0)
+ 175   7                                                              {day=28;}
+ 176   7                                                              }
+ 177   6                                              }               
+ 178   5                              while(!P2_4);
+C51 COMPILER V9.01   ER                                                                    03/04/2023 01:18:47 PAGE 4   
+
+ 179   5                      }  
+ 180   4               }
+ 181   3          }// ÈÕ--
+ 182   2         case(0x37):{  
+ 183   3                      if(P2_4==0)
+ 184   3         {delay_ms(20);
+ 185   4                      if(P2_4==0)
+ 186   4                      {
+ 187   5                              shi++;
+ 188   5                              if(shi==24){shi=0;}  
+ 189   5                              while(!P2_4);
+ 190   5                      }  
+ 191   4               }
+ 192   3          }// Ê±++
+ 193   2         case(0x77):{ 
+ 194   3                      if(P2_4==0)
+ 195   3         {delay_ms(20);
+ 196   4                      if(P2_4== 0)
+ 197   4                      {  
+ 198   5                              if(shi>0)
+ 199   5                         shi=shi-1;
+ 200   5                         else shi=23; 
+ 201   5                              while(!P2_4);
+ 202   5                      }  
+ 203   4               }
+ 204   3        }// Ê±--
+ 205   2         case(0x2F):{  
+ 206   3         
+ 207   3              if(P2_4==0)
+ 208   3         {delay_ms(20);
+ 209   4                      if(P2_4== 0)
+ 210   4                      {
+ 211   5                              fen++;
+ 212   5                              if(fen>=60){fen=0;}  
+ 213   5                              while(!P2_4);
+ 214   5                      }  
+ 215   4               }
+ 216   3          }// ·Ö++
+ 217   2         case(0x6F):{ 
+ 218   3         if(P2_4==0)
+ 219   3         {delay_ms(20);
+ 220   4                      if(P2_4== 0)
+ 221   4                      {
+ 222   5                              if(fen>0)
+ 223   5                         fen=fen-1;
+ 224   5                      else fen=59;  
+ 225   5                              while(!P2_4);
+ 226   5                      }  
+ 227   4               }
+ 228   3         }// ·Ö--
+ 229   2         case(0x1F):{  
+ 230   3                       if(P2_4==0)
+ 231   3         {delay_ms(20);
+ 232   4                      if(P2_4== 0)
+ 233   4                      {
+ 234   5                              miao++;  
+ 235   5                              if(miao>=60){miao=0;}
+ 236   5                              while(!P2_4);
+ 237   5                      }  
+ 238   4               }   
+ 239   3          }// Ãë++
+ 240   2         case(0x5F):{
+C51 COMPILER V9.01   ER                                                                    03/04/2023 01:18:47 PAGE 5   
+
+ 241   3                  
+ 242   3                 if(P2_4==0)
+ 243   3         {delay_ms(20);
+ 244   4                      if(P2_4== 0)
+ 245   4                      {
+ 246   5                              if(miao>0)
+ 247   5                           miao=miao-1;
+ 248   5                            else  miao=59;
+ 249   5                              while(!P2_4);
+ 250   5                      }  
+ 251   4               }   
+ 252   3         }// Ãë--
+ 253   2        }
+ 254   1       }
+ 255          void main(){
+ 256   1      
+ 257   1             Timer0Init();  //¶¨Ê±Æ÷³õÊ¼»¯
+ 258   1              while(1){
+ 259   2                      display();//ÏÔÊ¾
+ 260   2                      keyscan();              
+ 261   2         }
+ 262   1      
+ 263   1      }
+ 264           
+ 265          void timer0_int() interrupt 1{  //ÖÐ¶Ï·þÎñº¯Êý
+ 266   1               
+ 267   1               TL0 = 0x18;    
+ 268   1              TH0 = 0xFC;      
+ 269   1               i++;
+ 270   1          if(i == 1000){
+ 271   2                      i = 0;  //ÂúÒ»ÃëÇåÁã
+ 272   2                      miao++; //i = 1000 ÎªÒ»£¬Ãë±êÖ¾Î»¼Ó 1
+ 273   2      
+ 274   2                      if(miao == 60){
+ 275   3                              miao = 0;  //ÂúÒ»·ÖÇåÁã
+ 276   3                              fen++;
+ 277   3      
+ 278   3                              if(fen == 60){
+ 279   4                                      fen = 0;  //ÂúÒ»Ê±ÇåÁã
+ 280   4                                      shi++;
+ 281   4      
+ 282   4                                      if(shi == 24)
+ 283   4                                      {
+ 284   5                                              shi = 0;  //24Ð¡Ê±ÖÆ
+ 285   5                                              fen = 0;
+ 286   5                                              miao = 0;
+ 287   5                                         day++;
+ 288   5                                         if(mon==1||mon==3||mon==5||mon==7||mon==8||mon==10||mon==12)
+ 289   5                                         {
+ 290   6                                               if(day==32)
+ 291   6                                               {day=1;
+ 292   7                                               mon++;
+ 293   7                                               }
+ 294   6                                         }
+ 295   5                                         else if(mon==4||mon==6||mon==9||mon==11)
+ 296   5                                         {
+ 297   6                                               if(day==31)
+ 298   6                                               {day=1;
+ 299   7                                               mon++;
+ 300   7                                               }
+ 301   6                                              }
+ 302   5                                         else if(mon==2)
+C51 COMPILER V9.01   ER                                                                    03/04/2023 01:18:47 PAGE 6   
+
+ 303   5                                              {
+ 304   6                                              if((year+2000)%400==0||((year+2000)%100!=0&&(year+2000)%4==0))
+ 305   6                                                      {
+ 306   7                                                              if(day==30)
+ 307   7                                                                      {day=1;
+ 308   8                                                                        mon++;
+ 309   8                                                                      }
+ 310   7                                              }
+ 311   6                                              else  
+ 312   6                                                              {
+ 313   7                                                              if(day==29)
+ 314   7                                                              {day=1;
+ 315   8                                                              mon++;
+ 316   8                                                              }
+ 317   7                                               }
+ 318   6                                              }
+ 319   5                                      if (mon==13)
+ 320   5                                               { mon=1;
+ 321   6                                               year++;
+ 322   6                                              }
+ 323   5                                         }
+ 324   4                                      }
+ 325   3                              }
+ 326   2                      }
+ 327   1                      miao_L = miao%10;  //Ãë¸öÎ»
+ 328   1                      miao_H = miao/10;  //ÃëÊ®Î»
+ 329   1      
+ 330   1                      fen_L = fen%10;  //·Ö¸öÎ»
+ 331   1                      fen_H = fen/10;  //·ÖÊ®Î»
+ 332   1      
+ 333   1                      shi_L = shi%10;  //Ê±¸öÎ»
+ 334   1                      shi_H = shi/10;  //Ê±Ê®Î»
+ 335   1      
+ 336   1                      day_g=day%10;
+ 337   1                      day_s=day/10;
+ 338   1      
+ 339   1                      mon_g=mon%10;
+ 340   1                      mon_s=mon/10;
+ 341   1      
+ 342   1                      year_g=year%10;
+ 343   1                      year_s=year/10;
+ 344   1       }
+ 345          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1446    ----
+   CONSTANT SIZE    =     11    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     20       2
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
